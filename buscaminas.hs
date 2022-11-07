@@ -19,9 +19,25 @@ main = do
    let tablero = map (map (read::String->Int)) (map words (lines contenido))
    let tableroBackEnd  = modTableroBack  tablero
    let tableroFrontEnd = modTableroFront tablero
-   putStrLn contenido
+   
+-- ** Interaccion **
+   
+   putStrLn "¿Que accion quieres hacer? Bandera/Descubrir/QuitarBandera"
+   accion <- getLine
+   putStrLn "Primera coordenada"
+   n <- getLine -- hacer un check de  /= "Y"
+{-
+   if length n /= 1 then
+       putStrLn "La coordenada no es correcta, debe ser un solo numero"
+       main -- buscar manera de no ser tan radical
+-}
+   putStrLn "Segunda coordenada"
+   m <- getLine
+   let coordenadas = (n,m)
+   putStrLn "Hola!"
+   --putStrLn contenido
 
-
+-- ** DATOS **
 
 data Casilla = NoMina [Int] | Mina  | Borde
    deriving (Eq,Show,Read)
@@ -32,7 +48,7 @@ type TableroFront = [[Estado]]
 data Estado = Flag  | Desc Casilla | NoDesc Casilla | Aux -- Conseguir sustituir aux
    deriving (Eq,Show,Read)                            -- aqui o eliminarlos de front
 
--- BACK END
+-- ** BACK END ** 
 modTableroBack :: [[Int]] -> TableroBack
 modTableroBack xs = map modFilaBack xs
 
@@ -43,7 +59,7 @@ modFilaBack (x:xs)
   |x == 12 = Mina  : modFilaBack xs
   |otherwise = NoMina [x] : modFilaBack xs
 
--- FRONT END
+-- ** FRONT END **
 
 modTableroFront :: [[Int]] -> TableroFront
 modTableroFront xs = map modFilaFront xs
