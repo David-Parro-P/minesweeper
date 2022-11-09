@@ -146,7 +146,74 @@ bucleCoordenadaDos = do
    else putStrLn "No es una coordenada correcta" >> bucleCoordenadaDos
 
 
-{-
-    ** DESCUBRIR **
+{-               **TRABAJAR DESCUBRIR**
+-- Anadir un si la coordenada no es correcta o len incorrecta volver a introducir
+descubrir :: (Int, Int) -> Tablero -> Tablero -6- Cambiar bool por un tablero 
+descubrir (n,m) tablero_back
+   |(tablero_back!!n)!!m ==  Mina = endGame -- Muestra tablero resuelto y mensaje
+   |(tablero_back!!n)!!m == NoMina[x] -- cambia estado tablero_front
+
 -}
 
+-- hay que hacer la accion en la priemra llamada con un int = 0
+-- los dos priemros ints son unos contadores de posicion
+-- la segunda es el resultado de la function buscar ceros que devuelve la posicion
+
+-- rematar esta 
+buscarCerosTablero :: (Int,Int) -> TableroFront -> [(Int,Int)]
+buscarCerosTablero _ [[]] = []
+buscarCerosTablero (n,m) tablero
+   |tablero!!0 == [] = []
+   |a == length(tablero)                 = []
+   |b >= length(tablero!!0)              = (buscarCerosTablero (a+1,0) tablero)
+
+   |(tablero!!a)!!b == (Desc(NoMina[0])) = (a,b) : (buscarCerosTablero (a,b+1) tablero)
+   |otherwise = buscarCerosTablero (a,b+1) tablero
+   where a = fst (n,m)
+         b = snd (n,m)
+
+flipTresMedioDcha :: (a -> b -> c -> d) -> a -> c -> b -> d
+flipTresMedioDcha f x z y = f x y z
+
+-- la funcion que busca ceros despues de cada loop es pasar 
+-- map ((flipTresMedioDcha descubrirCeros) (0,0) tablero) (buscarCerosTablero (0,0) tablero)
+
+descubrirCeros :: (Int,Int) -> (Int,Int) -> TableroFront -> TableroFront
+descubrirCeros (contX,contY) (n,m) [] = []
+descubrirCeros (contX,contY) (n,m) (x:xs)
+   |(contX, contY) == (n-1, m-1) = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n-1,m-1) x) : xs)
+   |(contX, contY) == (n-1, m)   = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n-1,m) x) : xs)
+   |(contX, contY) == (n-1, m+1) = (descubrirFila (n-1,m+1) x) : (descubrirCeros (n,m-1) (n,m) xs)
+   |(contX, contY) == (n, m-1)   = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n,m-1) x) : xs)
+   |(contX, contY) == (n, m)     = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n,m) x) : xs)
+   |(contX, contY) == (n, m+1)   = (descubrirFila (n,m+1) x) : (descubrirCeros (n+1,m-1) (n,m) xs)
+   |(contX, contY) == (n+1, m-1) = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n+1,m-1) x) : xs)
+   |(contX, contY) == (n+1, m)   = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n+1,m) x) : xs)
+   |(contX, contY) == (n+1, m+1) = (descubrirFila (n+1,m+1) x) : xs
+   |fst((contX, contY)) < n-1    = descubrirCeros (contX+1,contY) (n,m) (x:xs)
+   |fst((contX, contY)) == n-1   = descubrirCeros (contX,contY+1) (n,m) (x:xs)
+
+descubrir :: Int -> (Int,Int) -> TableroFront -> TableroFront
+descubrir contador (n,m) [] = []
+descubrir contador (n,m) (x:xs)
+   |contador == n = (descubrirFila (n,m) x) : xs 
+   |otherwise = x : (descubrir (contador+1) (n,m) xs)
+
+-- con las minas todavia no he definido, ni decidido, que pasa 
+descubrirFila :: (Int,Int) -> [Estado] -> [Estado] -- Cambiar bool por un tablero 
+descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ quitarHead(segunda)
+   where primera = fst(splitAt m (fila))
+         segunda = snd(splitAt m (fila))
+         posicion = (fila)!!m
+
+descubrirCasilla :: Estado -> Estado
+descubrirCasilla (Desc(x)) = Desc(x)
+descubrirCasilla Flag = Flag
+descubrirCasilla Aux = Aux
+descubrirCasilla (NoDesc(NoMina[x]))
+   |x == 0 = Desc(NoMina[x])
+   |otherwise = (Desc(NoMina[x]))
+
+quitarHead :: [a] -> [a]
+quitarHead [] = []
+quitarHead (x:xs) = xs

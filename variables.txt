@@ -1,11 +1,6 @@
-[[11,11,11,11,11,11,11,11,11,11,11]
-, [11,0,1,1,1,0,1,12,2,1,11]
-, [11,0,1,12,1,0,2,4,12,2,11]
-, [11,0,1,1,1,0,1,12,12,2,11]
-, [11,0,0,0,0,1,2,3,2,1,11]
-, [11,0,0,0,0,1,12,1,0,0,11]
-, [11,0,0,0,0,2,2,2,0,0,11]
-, [11,0,1,1,1,1,12,1,0,0,11]
-, [11,0,1,12,1,2,2,2,1,1,11]
-, [11,0,1,1,1,1,12,1,1,12,11]
-, [11,11,11,11,11,11,11,11,11,11,11]]
+[[11,11,11,11,11,11,11,11,11,11,11], [11,0,1,1,1,0,1,12,2,1,11], [11,0,1,12,1,0,2,4,12,2,11], [11,0,1,1,1,0,1,12,12,2,11], [11,0,0,0,0,1,2,3,2,1,11], [11,0,0,0,0,1,12,1,0,0,11], [11,0,0,0,0,2,2,2,0,0,11], [11,0,1,1,1,1,12,1,0,0,11], [11,0,1,12,1,2,2,2,1,1,11], [11,0,1,1,1,1,12,1,1,12,11], [11,11,11,11,11,11,11,11,11,11,11]]
+
+[[Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc (NoMina [2]),NoDesc (NoMina [1]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc (NoMina [1]),NoDesc (NoMina [0]),NoDesc (NoMina [2]),NoDesc (NoMina [4]),NoDesc Mina,NoDesc (NoMina [2]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc Mina,NoDesc (NoMina [2]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc (NoMina [2]),NoDesc (NoMina [3]),NoDesc (NoMina [2]),NoDesc (NoMina [1]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc (NoMina [1]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),NoDesc (NoMina [2]),NoDesc (NoMina [2]),NoDesc (NoMina [2]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc (NoMina [1]),NoDesc (NoMina [0]),NoDesc (NoMina [0]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc (NoMina [1]),NoDesc (NoMina [2]),NoDesc (NoMina [2]),NoDesc (NoMina [2]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc Mina,Aux],[Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux]]
+
+
+[[Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux],[Aux,NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [1]),NoDesc (NoMina [0]),NoDesc (NoMina [1]),NoDesc Mina,NoDesc (NoMina [2]),NoDesc (NoMina [1]),Aux],[Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux,Aux]]
