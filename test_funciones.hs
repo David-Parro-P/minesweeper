@@ -83,3 +83,70 @@ dibujarCasilla Borde = []
 dibujarCasilla Mina = "\ESC[0mx"
 dibujarCasilla (NoMina[x]) = colores!!x ++ show x
    where colores = ["\ESC[37m", "\ESC[34m", "\ESC[92m", "\ESC[91m", "\ESC[35m", "\ESC[95m", "\ESC[33m", "\ESC[96m", "\ESC[90m", "\ESC[37m"]
+
+comprobarAccion :: [Char] -> Bool
+comprobarAccion letras
+   |letras == "flag" = True
+   |otherwise = False
+
+-- Jugar bucle
+nameReturn :: IO String
+nameReturn = do putStr "What is your first name? "
+                first <- getLine
+                putStr "And your last name? "
+                last <- getLine
+                let full = first ++ " " ++ last
+                return full
+greetAndSeeYou :: IO ()
+greetAndSeeYou = do name <- nameReturn
+                    putStrLn ("See you, " ++ name ++ "!")
+
+main :: IO ()
+main = do
+-- lectura y tratamiento
+   let ruta = "C:/Users/David/Desktop/Haskell/practica_david/tests.txt"
+   contenido <- readFile ruta
+   let tablero = map (map (read::String->Int)) (map words (lines contenido))
+   let tableroFrontEnd = modTableroFront tablero
+-- asignaciones
+   accion <- bucleAccion
+   n      <- bucleCoordenada
+   m      <- bucleCoordenadaDos
+   putStrLn "Hola!"
+
+{- 
+   Corregir: deja meter un string de un caracter como coordenada
+   No puede meter dos ints como coordenada tipo 10 
+   me gustaria otro salto de linea por claridad
+-}
+
+
+bucleAccion :: IO String
+bucleAccion = do
+   putStrLn "¿Que accion quieres hacer? (bandera/b) o (descubrir/d)"
+   accion <- getLine
+   if accion == "bandera" || accion == "b" || accion == "descubrir" || accion == "d"
+   then return accion
+   else putStrLn "No es una accion correcta" >> bucleAccion
+
+bucleCoordenada :: IO String
+bucleCoordenada = do
+   putStrLn "Elige una primera coordenada (numero natural)"
+   primera <- getLine
+   if length primera == 1
+   then return primera
+   else putStrLn "No es una coordenada correcta" >> bucleCoordenada
+
+bucleCoordenadaDos :: IO String
+bucleCoordenadaDos = do
+   putStrLn "Elige una segunda coordenada (numero natural)"
+   segunda <- getLine
+   if length segunda == 1
+   then return segunda
+   else putStrLn "No es una coordenada correcta" >> bucleCoordenadaDos
+
+
+{-
+    ** DESCUBRIR **
+-}
+
