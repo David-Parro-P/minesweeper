@@ -1,4 +1,4 @@
--- "C:/Users/David/Desktop/Haskell/practica_david/test_funciones.hs"
+-- "C:/Users/David/Desktop/progDeclarativa/Haskell/minesweeper-main/test_funciones.hs"
 
 modificarLDL :: [[Int]] -> [[Int]]
 modificarLDL [[]] = [[]]
@@ -103,16 +103,13 @@ greetAndSeeYou = do name <- nameReturn
 
 main :: IO ()
 main = do
--- lectura y tratamiento
-   let ruta = "C:/Users/David/Desktop/Haskell/practica_david/tests.txt"
+   -- lectura y tratamiento
+   let ruta = "tests.txt"
    contenido <- readFile ruta
    let tablero = map (map (read::String->Int)) (map words (lines contenido))
    let tableroFrontEnd = modTableroFront tablero
--- asignaciones
-   accion <- bucleAccion
-   n      <- bucleCoordenada
-   m      <- bucleCoordenadaDos
-   putStrLn "Hola!"
+   -- juego 
+   bucleJuego tableroFrontEnd
 
 {- 
    Corregir: deja meter un string de un caracter como coordenada
@@ -120,6 +117,15 @@ main = do
    me gustaria otro salto de linea por claridad
 -}
 
+bucleJuego :: TableroFront  -> IO()
+bucleJuego tablero = do
+   accion       <- bucleAccion
+   n            <- fmap (read :: String -> Int) bucleCoordenada
+   m            <- fmap (read :: String -> Int) bucleCoordenadaDos
+   let tableroNuevo = descubrir 0 (n,m) tablero
+   if encontrarMina tableroNuevo
+   then putStrLn "Espabila"
+   else mapM_ putStrLn (dibujarTablero tablero) >> bucleJuego tableroNuevo
 
 bucleAccion :: IO String
 bucleAccion = do
@@ -160,6 +166,10 @@ descubrir (n,m) tablero_back
 -- la segunda es el resultado de la function buscar ceros que devuelve la posicion
 
 -- rematar esta 
+
+encontrarMina :: TableroFront -> Bool
+encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)
+
 buscarCerosTablero :: (Int,Int) -> TableroFront -> [(Int,Int)]
 buscarCerosTablero _ [[]] = []
 buscarCerosTablero (n,m) tablero

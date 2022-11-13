@@ -1,6 +1,6 @@
 -- Imports needed
 
--- "C:/Users/David/Desktop/Haskell/practica_david/buscaminas.hs"
+-- "C:/Users/David/Desktop/progDeclarativa/Haskell/minesweeper-main/buscaminas.hs"
 import System.IO
 import Text.Read (readMaybe)
 import Data.Maybe
@@ -15,16 +15,18 @@ readListOfInts = read
 main :: IO ()
 main = do
 -- lectura y tratamiento
-   let ruta = "C:/Users/David/Desktop/Haskell/practica_david/tests.txt"
+   let ruta = "tests.txt"
    contenido <- readFile ruta
    let tablero = map (map (read::String->Int)) (map words (lines contenido))
    let tableroFrontEnd = modTableroFront tablero
-
+   bucleJuego tableroFrontEnd
 -- asignaciones
+{-
    accion <- bucleAccion
    n      <- bucleCoordenada
    m      <- bucleCoordenadaDos
    mapM_ putStrLn (dibujarTablero tableroFrontEnd)
+-}
 
 
 -- ** DATOS **
@@ -131,6 +133,7 @@ descubrirCasilla :: Estado -> Estado
 descubrirCasilla (Desc(x)) = Desc(x)
 descubrirCasilla Flag = Flag
 descubrirCasilla Aux = Aux
+descubrirCasilla (NoDesc(Mina)) = (Desc(Mina))
 descubrirCasilla (NoDesc(NoMina[x]))
    |x == 0 = Desc(NoMina[x])
    |otherwise = (Desc(NoMina[x]))
@@ -183,6 +186,27 @@ comprobarAccion letras
    No puede meter dos ints como coordenada tipo 10 
    me gustaria otro salto de linea por claridad
 -}
+-- CAMBIAR DE SITIO Y ESCRIBIRLA
+encontrarMina :: TableroFront -> Bool
+encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)
+
+{-
+   accion       <- bucleAccion
+   n            <- fmap (read :: String -> Int) bucleCoordenada
+   m            <- fmap (read :: String -> Int) bucleCoordenadaDos
+   tableroNuevo <- descubrir 0 (n,m) tablero
+-}
+
+bucleJuego :: TableroFront  -> IO()
+bucleJuego tablero = do
+   accion       <- bucleAccion
+   n            <- fmap (read :: String -> Int) bucleCoordenada
+   m            <- fmap (read :: String -> Int) bucleCoordenadaDos
+   let tableroNuevo = descubrir 0 (n,m) tablero
+   if encontrarMina tableroNuevo
+   then putStrLn "Espabila"
+   else mapM_ putStrLn (dibujarTablero tablero) >> bucleJuego tableroNuevo
+
 
 bucleAccion :: IO String
 bucleAccion = do
