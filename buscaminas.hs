@@ -75,7 +75,6 @@ descubrir :: (Int, Int) -> Tablero -> Tablero -6- Cambiar bool por un tablero
 descubrir (n,m) tablero_back
    |(tablero_back!!n)!!m ==  Mina = endGame -- Muestra tablero resuelto y mensaje
    |(tablero_back!!n)!!m == NoMina[x] -- cambia estado tablero_front
-
 -}
 
 -- hay que hacer la accion en la priemra llamada con un int = 0
@@ -124,7 +123,7 @@ descubrir contador (n,m) (x:xs)
 
 -- con las minas todavia no he definido, ni decidido, que pasa 
 descubrirFila :: (Int,Int) -> [Estado] -> [Estado] -- Cambiar bool por un tablero 
-descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ quitarHead(segunda)
+descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ tail(segunda)
    where primera = fst(splitAt m (fila))
          segunda = snd(splitAt m (fila))
          posicion = (fila)!!m
@@ -138,14 +137,9 @@ descubrirCasilla (NoDesc(NoMina[x]))
    |x == 0 = Desc(NoMina[x])
    |otherwise = (Desc(NoMina[x]))
 
-quitarHead :: [a] -> [a]
-quitarHead [] = []
-quitarHead (x:xs) = xs
-
 
 
 {- ** Pretty Prints **
-
 -}
 
 dibujarTablero :: TableroFront -> [[Char]]
@@ -179,7 +173,6 @@ comprobarAccion letras
 
 
 {- 
-
    ** MENUS y temas de IO **
    
    Corregir: deja meter un string de un caracter como coordenada
@@ -205,7 +198,7 @@ bucleJuego tablero = do
    let tableroNuevo = descubrir 0 (n,m) tablero
    if encontrarMina tableroNuevo
    then putStrLn "Espabila"
-   else mapM_ putStrLn (dibujarTablero tablero) >> bucleJuego tableroNuevo
+   else mapM_ putStrLn (dibujarTablero tableroNuevo) >> bucleJuego tableroNuevo
 
 
 bucleAccion :: IO String
