@@ -1,6 +1,6 @@
 -- Imports needed
 
--- "C:/Users/David/Desktop/Haskell/practica_david/buscaminas.hs"
+-- "C:/Users/David/Desktop/progDeclarativa/Haskell/minesweeper-main/buscaminas.hs"
 import System.IO
 import Text.Read (readMaybe)
 import Data.Maybe
@@ -15,16 +15,18 @@ readListOfInts = read
 main :: IO ()
 main = do
 -- lectura y tratamiento
-   let ruta = "C:/Users/David/Desktop/Haskell/practica_david/tests.txt"
+   let ruta = "tests.txt"
    contenido <- readFile ruta
    let tablero = map (map (read::String->Int)) (map words (lines contenido))
    let tableroFrontEnd = modTableroFront tablero
-
+   bucleJuego tableroFrontEnd
 -- asignaciones
+{-
    accion <- bucleAccion
    n      <- bucleCoordenada
    m      <- bucleCoordenadaDos
    mapM_ putStrLn (dibujarTablero tableroFrontEnd)
+-}
 
 
 -- ** DATOS **
@@ -73,7 +75,6 @@ descubrir :: (Int, Int) -> Tablero -> Tablero -6- Cambiar bool por un tablero
 descubrir (n,m) tablero_back
    |(tablero_back!!n)!!m ==  Mina = endGame -- Muestra tablero resuelto y mensaje
    |(tablero_back!!n)!!m == NoMina[x] -- cambia estado tablero_front
-
 -}
 
 -- hay que hacer la accion en la priemra llamada con un int = 0
@@ -122,7 +123,7 @@ descubrir contador (n,m) (x:xs)
 
 -- con las minas todavia no he definido, ni decidido, que pasa 
 descubrirFila :: (Int,Int) -> [Estado] -> [Estado] -- Cambiar bool por un tablero 
-descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ quitarHead(segunda)
+descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ tail(segunda)
    where primera = fst(splitAt m (fila))
          segunda = snd(splitAt m (fila))
          posicion = (fila)!!m
@@ -131,18 +132,14 @@ descubrirCasilla :: Estado -> Estado
 descubrirCasilla (Desc(x)) = Desc(x)
 descubrirCasilla Flag = Flag
 descubrirCasilla Aux = Aux
+descubrirCasilla (NoDesc(Mina)) = (Desc(Mina))
 descubrirCasilla (NoDesc(NoMina[x]))
    |x == 0 = Desc(NoMina[x])
    |otherwise = (Desc(NoMina[x]))
 
-quitarHead :: [a] -> [a]
-quitarHead [] = []
-quitarHead (x:xs) = xs
-
 
 
 {- ** Pretty Prints **
-
 -}
 
 dibujarTablero :: TableroFront -> [[Char]]
@@ -176,13 +173,33 @@ comprobarAccion letras
 
 
 {- 
-
    ** MENUS y temas de IO **
    
    Corregir: deja meter un string de un caracter como coordenada
    No puede meter dos ints como coordenada tipo 10 
    me gustaria otro salto de linea por claridad
 -}
+-- CAMBIAR DE SITIO Y ESCRIBIRLA
+encontrarMina :: TableroFront -> Bool
+encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)
+
+{-
+   accion       <- bucleAccion
+   n            <- fmap (read :: String -> Int) bucleCoordenada
+   m            <- fmap (read :: String -> Int) bucleCoordenadaDos
+   tableroNuevo <- descubrir 0 (n,m) tablero
+-}
+
+bucleJuego :: TableroFront  -> IO()
+bucleJuego tablero = do
+   accion       <- bucleAccion
+   n            <- fmap (read :: String -> Int) bucleCoordenada
+   m            <- fmap (read :: String -> Int) bucleCoordenadaDos
+   let tableroNuevo = descubrir 0 (n,m) tablero
+   if encontrarMina tableroNuevo
+   then putStrLn "Espabila"
+   else mapM_ putStrLn (dibujarTablero tableroNuevo) >> bucleJuego tableroNuevo
+
 
 bucleAccion :: IO String
 bucleAccion = do
