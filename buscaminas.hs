@@ -98,22 +98,42 @@ flipTresMedioDcha :: (a -> b -> c -> d) -> a -> c -> b -> d
 flipTresMedioDcha f x z y = f x y z
 
 -- la funcion que busca ceros despues de cada loop es pasar 
--- map ((flipTresMedioDcha descubrirCeros) (0,0) tablero) (buscarCerosTablero (0,0) tablero)
+-- map (flipTresMedioDcha descubrirCeros (0,0) tablero2) (buscarCerosTablero (0,0) tablero2)
 
-descubrirCeros :: (Int,Int) -> (Int,Int) -> TableroFront -> TableroFront
-descubrirCeros (contX,contY) (n,m) [] = []
-descubrirCeros (contX,contY) (n,m) (x:xs)
-   |(contX, contY) == (n-1, m-1) = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n-1,m-1) x) : xs)
-   |(contX, contY) == (n-1, m)   = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n-1,m) x) : xs)
-   |(contX, contY) == (n-1, m+1) = (descubrirFila (n-1,m+1) x) : (descubrirCeros (n,m-1) (n,m) xs)
-   |(contX, contY) == (n, m-1)   = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n,m-1) x) : xs)
-   |(contX, contY) == (n, m)     = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n,m) x) : xs)
-   |(contX, contY) == (n, m+1)   = (descubrirFila (n,m+1) x) : (descubrirCeros (n+1,m-1) (n,m) xs)
-   |(contX, contY) == (n+1, m-1) = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n+1,m-1) x) : xs)
-   |(contX, contY) == (n+1, m)   = descubrirCeros (contX,contY+1) (n,m) ((descubrirFila (n+1,m) x) : xs)
-   |(contX, contY) == (n+1, m+1) = (descubrirFila (n+1,m+1) x) : xs
-   |fst((contX, contY)) < n-1    = descubrirCeros (contX+1,contY) (n,m) (x:xs)
-   |fst((contX, contY)) == n-1   = descubrirCeros (contX,contY+1) (n,m) (x:xs)
+limpiarTableroFeliz :: TableroFront -> TableroFront
+limpiarTableroFeliz  tablero = repetirN limpiarCerosFront tablero (length tablero)
+
+limpiarCerosFront :: TableroFront -> TableroFront
+limpiarCerosFront tablero   =  f listaDeIncidencias
+   where listaDeIncidencias = map listIncidencia (buscarCerosTablero (0,0) tablero)
+         f                  = limpiarCerosTablero tablero
+
+repetirN :: (a -> a) -> a -> Int -> a
+repetirN f x n  = iterate f x !! n
+
+
+-- se puede optimizar a length // 2 creo 
+-- Reescribir como FOLDR !!!!!
+
+limpiarCerosTablero :: TableroFront -> [[(Int,Int)]] -> TableroFront
+limpiarCerosTablero tablero []   = tablero
+limpiarCerosTablero tablero (x:xs) = limpiarCerosTablero (limpiarCeros tablero x) xs 
+
+
+limpiarCeros :: TableroFront -> [(Int,Int)] -> TableroFront
+limpiarCeros tablero []     = tablero
+limpiarCeros tablero (x:xs) = limpiarCeros (descubrir 0 x tablero) xs
+
+listIncidencia :: (Int,Int) -> [(Int,Int)]
+listIncidencia (n,m) = [(n+x,m+y) | x <- [-1,0,1], y <- [-1,0,1]]  
+
+
+
+
+
+
+
+
 
 descubrir :: Int -> (Int,Int) -> TableroFront -> TableroFront
 descubrir contador (n,m) [] = []
@@ -190,16 +210,20 @@ encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)
    tableroNuevo <- descubrir 0 (n,m) tablero
 -}
 
+-- ¿eliminar la doble copia?
+
 bucleJuego :: TableroFront  -> IO()
 bucleJuego tablero = do
    accion       <- bucleAccion
    n            <- fmap (read :: String -> Int) bucleCoordenada
    m            <- fmap (read :: String -> Int) bucleCoordenadaDos
-   let tableroNuevo = descubrir 0 (n,m) tablero
+   let tablero2     = descubrir 0 (n,m) tablero
+   let tableroNuevo = limpiarTableroFeliz tablero2
    if encontrarMina tableroNuevo
-   then putStrLn "Espabila"
+   then do
+      putStrLn ("Has perdido, ¿Quieres volver a jugar? (s/n)") 
+      mapM_ putStrLn (dibujarTablero tableroNuevo)
    else mapM_ putStrLn (dibujarTablero tableroNuevo) >> bucleJuego tableroNuevo
-
 
 bucleAccion :: IO String
 bucleAccion = do
