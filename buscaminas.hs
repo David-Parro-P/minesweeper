@@ -20,13 +20,6 @@ main = do
    let tablero = map (map (read::String->Int)) (map words (lines contenido))
    let tableroFrontEnd = modTableroFront tablero
    bucleJuego tableroFrontEnd
--- asignaciones
-{-
-   accion <- bucleAccion
-   n      <- bucleCoordenada
-   m      <- bucleCoordenadaDos
-   mapM_ putStrLn (dibujarTablero tableroFrontEnd)
--}
 
 
 -- ** DATOS **
@@ -37,7 +30,7 @@ data Casilla = NoMina [Int] | Mina  | Borde
 type TableroBack = [[Casilla]]
 type TableroFront = [[Estado]]
 
-data Estado = Flag  | Desc Casilla | NoDesc Casilla | Aux -- Conseguir sustituir aux
+data Estado = Flag Casilla | Desc Casilla | NoDesc Casilla | Aux -- Conseguir sustituir aux
    deriving (Eq,Show,Read)                            -- aqui o eliminarlos de front
 
 -- ** BACK END ** 
@@ -69,19 +62,12 @@ modFilaFront (x:xs)
 
 
 
-{-               **TRABAJAR DESCUBRIR**
--- Anadir un si la coordenada no es correcta o len incorrecta volver a introducir
-descubrir :: (Int, Int) -> Tablero -> Tablero -6- Cambiar bool por un tablero 
-descubrir (n,m) tablero_back
-   |(tablero_back!!n)!!m ==  Mina = endGame -- Muestra tablero resuelto y mensaje
-   |(tablero_back!!n)!!m == NoMina[x] -- cambia estado tablero_front
--}
+
 
 -- hay que hacer la accion en la priemra llamada con un int = 0
--- los dos priemros ints son unos contadores de posicion
--- la segunda es el resultado de la function buscar ceros que devuelve la posicion
+-- los dos primeros ints son unos contadores de posicion
+-- la segunda es el resultado de la funcion buscar ceros que devuelve la posicion
 
--- rematar esta 
 buscarCerosTablero :: (Int,Int) -> TableroFront -> [(Int,Int)]
 buscarCerosTablero _ [[]] = []
 buscarCerosTablero (n,m) tablero
@@ -111,8 +97,6 @@ limpiarCerosFront tablero   =  f listaDeIncidencias
 repetirN :: (a -> a) -> a -> Int -> a
 repetirN f x n  = iterate f x !! n
 
-
--- se puede optimizar a length // 2 creo 
 -- Reescribir como FOLDR !!!!!
 
 limpiarCerosTablero :: TableroFront -> [[(Int,Int)]] -> TableroFront
@@ -129,20 +113,13 @@ listIncidencia (n,m) = [(n+x,m+y) | x <- [-1,0,1], y <- [-1,0,1]]
 
 
 
-
-
-
-
-
-
 descubrir :: Int -> (Int,Int) -> TableroFront -> TableroFront
 descubrir contador (n,m) [] = []
 descubrir contador (n,m) (x:xs)
    |contador == n = (descubrirFila (n,m) x) : xs 
    |otherwise = x : (descubrir (contador+1) (n,m) xs)
 
--- con las minas todavia no he definido, ni decidido, que pasa 
-descubrirFila :: (Int,Int) -> [Estado] -> [Estado] -- Cambiar bool por un tablero 
+descubrirFila :: (Int,Int) -> [Estado] -> [Estado] 
 descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ tail(segunda)
    where primera = fst(splitAt m (fila))
          segunda = snd(splitAt m (fila))
@@ -150,7 +127,7 @@ descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ tail(segund
 
 descubrirCasilla :: Estado -> Estado
 descubrirCasilla (Desc(x)) = Desc(x)
-descubrirCasilla Flag = Flag
+descubrirCasilla (Flag(x)) = Flag(x)
 descubrirCasilla Aux = Aux
 descubrirCasilla (NoDesc(Mina)) = (Desc(Mina))
 descubrirCasilla (NoDesc(NoMina[x]))
@@ -167,6 +144,26 @@ descubrirTodoTest tablero (x:xs) = descubrirTodoTest (descubrir 0 x tablero) xs
 descubrirTodo :: TableroFront -> TableroFront
 descubrirTodo tablero = descubrirTodoTest tablero casillas
    where casillas = [(x,y) | x <- [1..(length tablero - 2)] , y <- [1..(length (tablero!!0) - 2)]]
+{- ** FLAG ** -}
+
+
+bandera :: Int -> (Int,Int) -> TableroFront -> TableroFront
+bandera contador (n,m) [] = []
+bandera contador (n,m) (x:xs)
+   |contador == n = (banderaFila (n,m) x) : xs 
+   |otherwise = x : (bandera (contador+1) (n,m) xs)
+
+banderaFila :: (Int,Int) -> [Estado] -> [Estado] 
+banderaFila (n,m) fila = primera ++ [banderaCasilla posicion] ++ tail(segunda)
+   where primera = fst(splitAt m (fila))
+         segunda = snd(splitAt m (fila))
+         posicion = (fila)!!m
+
+banderaCasilla :: Estado -> Estado
+banderaCasilla (Desc(x)) = Desc(x)
+banderaCasilla (Flag(x)) = NoDesc(x)
+banderaCasilla Aux = Aux
+banderaCasilla (NoDesc(x)) = (Flag(x))
 
 {- ** Pretty Prints **
 -}
@@ -179,11 +176,13 @@ dibujarLinea :: [Estado] -> [Char]
 dibujarLinea [] = ""
 dibujarLinea (x:xs)
    |x == Aux = dibujarLinea xs
-   |x == Flag = "\ESC[0m!" ++ dibujarLinea xs
-   |x == NoDesc(Mina) = "\ESC[0m*" ++ dibujarLinea xs
-   |elem x listNoDesc = "\ESC[0m*" ++ dibujarLinea xs
+   |x == (Flag(Mina))      = "\ESC[31m!" ++ dibujarLinea xs
+   |elem x listNoDescFlag  = "\ESC[31m!" ++ dibujarLinea xs
+   |x == NoDesc(Mina)      = "\ESC[0m*" ++ dibujarLinea xs
+   |elem x listNoDesc      = "\ESC[0m*" ++ dibujarLinea xs
    |otherwise = sacarNumDesc x ++ dibujarLinea xs
-  where listNoDesc = [NoDesc(NoMina[i]) | i <- [0..9]]
+  where listNoDesc     = [NoDesc(NoMina[i]) | i <- [0..9]]
+        listNoDescFlag = [Flag(NoMina[i]) | i <- [0..9]]
 
 sacarNumDesc :: Estado -> [Char]
 sacarNumDesc (Desc (x)) = dibujarCasilla x
@@ -203,21 +202,11 @@ comprobarAccion letras
 
 {- 
    ** MENUS y temas de IO **
-   
-   Corregir: deja meter un string de un caracter como coordenada
-   No puede meter dos ints como coordenada tipo 10 
-   me gustaria otro salto de linea por claridad
+
 -}
 -- CAMBIAR DE SITIO Y ESCRIBIRLA
 encontrarMina :: TableroFront -> Bool
 encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)
-
-{-
-   accion       <- bucleAccion
-   n            <- fmap (read :: String -> Int) bucleCoordenada
-   m            <- fmap (read :: String -> Int) bucleCoordenadaDos
-   tableroNuevo <- descubrir 0 (n,m) tablero
--}
 
 -- ¿eliminar la doble copia?
 
@@ -226,7 +215,7 @@ bucleJuego tablero = do
    accion       <- bucleAccion
    n            <- fmap (read :: String -> Int) (bucleCoordenada (length tablero -2))
    m            <- fmap (read :: String -> Int) (bucleCoordenadaDos (length (tablero!!0) -2))
-   let tablero2     = descubrir 0 (n,m) tablero
+   let tablero2     = accionJuego tablero (n,m) accion
    let tableroNuevo = limpiarTableroFeliz tablero2
    if encontrarMina tableroNuevo
    then do
@@ -234,6 +223,12 @@ bucleJuego tablero = do
       putStrLn ("Has perdido, ¿Quieres volver a jugar? (s/n)")
       mapM_ putStrLn (dibujarTablero tableroPerdedor)
    else mapM_ putStrLn (dibujarTablero tableroNuevo) >> bucleJuego tableroNuevo
+
+-- anadir bandera y descubri
+accionJuego :: TableroFront -> (Int,Int) -> String -> TableroFront
+accionJuego tablero (n,m) "b" = bandera   0 (n,m) tablero 
+accionJuego tablero (n,m) "d" = descubrir 0 (n,m) tablero
+
 
 bucleAccion :: IO String
 bucleAccion = do
@@ -261,6 +256,3 @@ bucleCoordenadaDos longDos = do
 
 
 {- ** ENDGAME ** -}
-
-endGame :: Bool -- Pendiente de escribir
-endGame = False 
