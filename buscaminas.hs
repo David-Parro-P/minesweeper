@@ -157,7 +157,16 @@ descubrirCasilla (NoDesc(NoMina[x]))
    |x == 0 = Desc(NoMina[x])
    |otherwise = (Desc(NoMina[x]))
 
+-- Para ensenar todo endGame
 
+
+descubrirTodoTest :: TableroFront -> [(Int,Int)] -> TableroFront
+descubrirTodoTest tablero [] = tablero
+descubrirTodoTest tablero (x:xs) = descubrirTodoTest (descubrir 0 x tablero) xs
+
+descubrirTodo :: TableroFront -> TableroFront
+descubrirTodo tablero = descubrirTodoTest tablero casillas
+   where casillas = [(x,y) | x <- [1..(length tablero - 2)] , y <- [1..(length (tablero!!0) - 2)]]
 
 {- ** Pretty Prints **
 -}
@@ -182,7 +191,7 @@ sacarNumDesc (Desc (x)) = dibujarCasilla x
 
 dibujarCasilla :: Casilla -> [Char]
 dibujarCasilla Borde = []
-dibujarCasilla Mina = "\ESC[0mx"
+dibujarCasilla Mina = "\ESC[31mx\ESC[0m"
 dibujarCasilla (NoMina[x]) = colores!!x ++ show x
    where colores = ["\ESC[37m", "\ESC[34m", "\ESC[92m", "\ESC[91m", "\ESC[35m", "\ESC[95m", "\ESC[33m", "\ESC[96m", "\ESC[90m", "\ESC[37m"]
 
@@ -215,14 +224,15 @@ encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)
 bucleJuego :: TableroFront  -> IO()
 bucleJuego tablero = do
    accion       <- bucleAccion
-   n            <- fmap (read :: String -> Int) bucleCoordenada
-   m            <- fmap (read :: String -> Int) bucleCoordenadaDos
+   n            <- fmap (read :: String -> Int) (bucleCoordenada (length tablero -2))
+   m            <- fmap (read :: String -> Int) (bucleCoordenadaDos (length (tablero!!0) -2))
    let tablero2     = descubrir 0 (n,m) tablero
    let tableroNuevo = limpiarTableroFeliz tablero2
    if encontrarMina tableroNuevo
    then do
-      putStrLn ("Has perdido, ¿Quieres volver a jugar? (s/n)") 
-      mapM_ putStrLn (dibujarTablero tableroNuevo)
+      let tableroPerdedor = descubrirTodo tableroNuevo
+      putStrLn ("Has perdido, ¿Quieres volver a jugar? (s/n)")
+      mapM_ putStrLn (dibujarTablero tableroPerdedor)
    else mapM_ putStrLn (dibujarTablero tableroNuevo) >> bucleJuego tableroNuevo
 
 bucleAccion :: IO String
@@ -233,21 +243,21 @@ bucleAccion = do
    then return accion
    else putStrLn "No es una accion correcta" >> bucleAccion
 
-bucleCoordenada :: IO String
-bucleCoordenada = do
-   putStrLn "Elige una primera coordenada (numero natural)"
+bucleCoordenada :: Int -> IO String
+bucleCoordenada longitud= do
+   putStrLn ("Filas: elige una primera coordenada entre 1 y " ++ (show longitud))
    primera <- getLine
-   if length primera == 1
+   if elem primera [show x | x <- [1..longitud]]
    then return primera
-   else putStrLn "No es una coordenada correcta" >> bucleCoordenada
+   else putStrLn "No es una coordenada correcta" >> bucleCoordenada longitud
 
-bucleCoordenadaDos :: IO String
-bucleCoordenadaDos = do
-   putStrLn "Elige una segunda coordenada (numero natural)"
+bucleCoordenadaDos :: Int -> IO String
+bucleCoordenadaDos longDos = do
+   putStrLn ("Columnas: elige una segunda coordenada entre 1 y " ++ (show longDos))
    segunda <- getLine
-   if length segunda == 1
+   if elem segunda [show x | x <- [1..longDos]]
    then return segunda
-   else putStrLn "No es una coordenada correcta" >> bucleCoordenadaDos
+   else putStrLn "No es una coordenada correcta" >> bucleCoordenadaDos longDos
 
 
 {- ** ENDGAME ** -}
