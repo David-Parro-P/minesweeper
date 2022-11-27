@@ -1,0 +1,74 @@
+import System.Random
+
+       
+module CrearTablero
+(
+) where
+import Datos
+
+crearTablero::nminas->[[Int]]
+crearTablero = añadirminas (ponerbordes tablero0) posminas
+    where casillaspos=[(x,y) | x <- [0..10], y <- [0..10]]
+          fila= [0 | x <- [1..9]]
+          tablero0 = [fila | x <- [1..9]]
+          posminas= listaminas nminas g descubiertas
+          g= seed?
+          descubiertas=[]
+
+añadirminas:: [[Int]]->[Int]->[[Int]]
+añadirminas tablero [] = tablero
+añadirminas tablero (x:xs) = añadirminas (añadirmina tablero x ) xs
+         
+añadirmina:: [[Int]]->Int->[[Int]]
+añadirmina tablero x = parte1 ++ nfila1 ++ nfila2 ++ nfila3 ++ parte2
+    where (parte1,resto) = splitAt (a-1) tablero
+          (centro,parte2) = splitAt 3 resto
+          (fila1,filas) = splitAt 1 centro
+          (fila2,fila3)= splitAt 1 filas
+          nfila1= sumarunos b fila1
+          nfila2= sumarunosmina b fila2
+          nfila3= sumarunos b fila3
+          (a,b)= casillas!!x
+          casillas=[(x,y) | x <- [1..11], y <- [1..11]]
+          
+sumarunos::Int-> [[Int]]->[[Int]]
+sumarunos b fila = iz ++ [fil] ++ dr
+    where (iz,resto) = splitAt (b-1) fila
+          (centro, dr) = splitAt 3 resto
+          fil= map s1 (concat centro)
+
+sumarunosmina::Int-> [[Int]]->[[Int]]
+sumarunosmina b fila = iz ++ [fil] ++ dr
+    where (iz,resto) = splitAt (b-1) fila
+          (centro, dr) = splitAt 3 resto
+          filaa= concat centro
+          fil= s1 (take 1 filaa) ++ [12] ++ s1 (take 1 (reverse filaa))
+    
+ 
+  
+s1::Int->Int
+s1 a   
+    | a==11 = a
+    | a==12 = a
+    | otherwise = a+1
+
+    
+          
+listaminas::Int->G->[Int]->[Int]
+listaminas n g lista   
+  | busca r lista = listaminas n newg lista
+  | otherwise = r:(listaminas (n-1) newg (r:lista))  
+  where (r,newg)= randomR (1,81) (mkStdGen g)
+  
+busca :: Ord a => a -> [a] -> Bool
+busca x [] = False
+busca x (y:ys)
+  | x == y    = True
+  | otherwise = busca x ys 
+          
+ponerbordes::[[Int]]->[[Int]]
+ponerbordes tab= fila:(map bordes tab)++[fila]
+    where fila = [11 | x <- [0..11]] 
+    
+bordes::[Int]-[Int]
+bordes fila = 11:fila++[11]
