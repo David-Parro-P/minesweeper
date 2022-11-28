@@ -65,7 +65,7 @@ bucleAccion = do
    else putStrLn "No es una accion correcta" >> bucleAccion
 
 bucleCoordenada :: Int -> IO String
-bucleCoordenada longitud= do
+bucleCoordenada longitud = do
    putStrLn ("Filas: elige una primera coordenada entre 1 y " ++ (show longitud))
    primera <- getLine
    if elem primera [show x | x <- [1..longitud]]
@@ -83,3 +83,27 @@ bucleCoordenadaDos longDos = do
 
 {- ** ENDGAME ** -}
 
+guardarPartida :: TableroFront  -> IO()
+guardarPartida tablero = do
+   putStrLn "¿Con que nombre quieres guardar la partida?"
+   rutaGuardado <- getLine
+   let contenidoGuardado = show tablero 
+   writeFile rutaGuardado contenidoGuardado
+-- El espacio del final no molesta con las funciones de lectura
+-- words lo soluciona
+
+cargarPartida :: IO TableroFront
+cargarPartida = do
+   putStrLn "¿Que partida quieres cargar?"
+   rutaCargar   <- getLine
+   tableroCarga <- readFile rutaCargar
+   return ((read::String->TableroFront) tableroCarga)
+
+split :: Char -> String -> [String]
+split c xs = case break (==c) xs of 
+  (ls, "") -> [ls]
+  (ls, x:rs) -> ls : split c rs
+
+juntarConComa :: [String] -> String
+juntarConComa xs = (foldr (++) "" listaMod) ++ "\n"
+   where listaMod   = map (++",") xs
