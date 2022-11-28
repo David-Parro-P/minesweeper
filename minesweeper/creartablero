@@ -6,7 +6,7 @@ module CrearTablero
 ) where
 import Datos
 
-crearTablero::nminas->[[Int]]
+crearTablero::Int->[[Int]]
 crearTablero = añadirminas (ponerbordes tablero0) posminas
     where casillaspos=[(x,y) | x <- [0..10], y <- [0..10]]
           fila= [0 | x <- [1..9]]
