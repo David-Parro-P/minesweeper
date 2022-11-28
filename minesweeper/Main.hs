@@ -24,7 +24,9 @@ main = do
    contenido <- readFile ruta
    let tablero = map (map (read::String->Int)) (map words (lines contenido))
    let tableroFrontEnd = modTableroFront tablero
-   bucleJuego tableroFrontEnd
+   -- bucleJuego tableroFrontEnd
+   -- writeFile "testRead.txt" (show tableroFrontEnd)
+   bucleMenu
 
 {- 
    ** MENUS y temas de IO **
@@ -47,10 +49,10 @@ bucleJuego tablero = do
    then do
       let tableroPerdedor = descubrirTodo tableroNuevo
       putStrLn ("Has perdido, ¿Quieres volver a jugar? (s/n)")
-      mapM_ putStrLn (dibujarTablero tableroPerdedor)
+      mapM_ putStrLn (dibujarTablero tableroPerdedor) >> volverJugar
    else mapM_ putStrLn (dibujarTablero tableroNuevo) >> bucleJuego tableroNuevo
 
--- anadir bandera y descubri
+
 accionJuego :: TableroFront -> (Int,Int) -> String -> TableroFront
 accionJuego tablero (n,m) "b" = bandera   0 (n,m) tablero 
 accionJuego tablero (n,m) "d" = descubrir 0 (n,m) tablero
@@ -80,8 +82,24 @@ bucleCoordenadaDos longDos = do
    then return segunda
    else putStrLn "No es una coordenada correcta" >> bucleCoordenadaDos longDos
 
+bucleMenu :: IO()
+bucleMenu = do
+   accionM <- bucleAccionMenu
+   if accionM == "c"
+   then do
+      tableroC  <- cargarPartida
+      bucleJuego tableroC
+   else do
+      tableroN <- nuevaPartida
+      bucleJuego tableroN
 
-{- ** ENDGAME ** -}
+bucleAccionMenu :: IO String
+bucleAccionMenu = do
+   putStrLn "¿Quieres empezar una nueva partida (n) o cargar una existente (c)?"
+   accionMenu <- getLine
+   if accionMenu == "n" || accionMenu == "c" 
+   then return accionMenu
+   else putStrLn "No es una accion correcta" >> bucleAccionMenu
 
 guardarPartida :: TableroFront  -> IO()
 guardarPartida tablero = do
@@ -89,8 +107,6 @@ guardarPartida tablero = do
    rutaGuardado <- getLine
    let contenidoGuardado = show tablero 
    writeFile rutaGuardado contenidoGuardado
--- El espacio del final no molesta con las funciones de lectura
--- words lo soluciona
 
 cargarPartida :: IO TableroFront
 cargarPartida = do
@@ -99,11 +115,32 @@ cargarPartida = do
    tableroCarga <- readFile rutaCargar
    return ((read::String->TableroFront) tableroCarga)
 
-split :: Char -> String -> [String]
-split c xs = case break (==c) xs of 
-  (ls, "") -> [ls]
-  (ls, x:rs) -> ls : split c rs
+nuevaPartida :: IO TableroFront -- PLACE HOLDER CAMBIAR POR FUNCION NUEVA CON RANDOM
+nuevaPartida = do
+   putStrLn "¿Que partida quieres cargar?"
+   rutaCargar   <- getLine
+   tableroCarga <- readFile rutaCargar
+   return ((read::String->TableroFront) tableroCarga)
 
-juntarConComa :: [String] -> String
-juntarConComa xs = (foldr (++) "" listaMod) ++ "\n"
-   where listaMod   = map (++",") xs
+volverJugar :: IO()
+volverJugar = do
+   putStrLn "¿Quieres volver a jugar si(s)/no(n)?"
+   accion <- getLine
+   if accion == "s"
+   then bucleMenu
+   else do
+      if accion == "n"
+      then putStrLn "¡Gracias por jugar!"
+      else putStrLn "No es una accion correcta" >> volverJugar 
+{- ** ENDGAME ** -}
+
+
+
+
+
+
+{- Seguir el esquema del folio de menu
+   intenta que sea medio pura sin ifs
+-}
+
+
