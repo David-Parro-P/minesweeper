@@ -7,7 +7,7 @@ module CrearTablero
 import Datos
 
 crearTablero::Int->[[Int]]
-crearTablero = añadirminas (ponerbordes tablero0) posminas
+crearTablero = anadirMinas (ponerBordes tablero0) posminas
     where casillaspos=[(x,y) | x <- [0..10], y <- [0..10]]
           fila= [0 | x <- [1..9]]
           tablero0 = [fila | x <- [1..9]]
@@ -15,12 +15,12 @@ crearTablero = añadirminas (ponerbordes tablero0) posminas
           g= seed?
           descubiertas=[]
 
-añadirminas:: [[Int]]->[Int]->[[Int]]
-añadirminas tablero [] = tablero
-añadirminas tablero (x:xs) = añadirminas (añadirmina tablero x ) xs
+anadirMinas:: [[Int]]->[Int]->[[Int]]
+anadirMinas tablero [] = tablero
+anadirMinas tablero (x:xs) = anadirMinas (anadirMina tablero x ) xs
          
-añadirmina:: [[Int]]->Int->[[Int]]
-añadirmina tablero x = parte1 ++ nfila1 ++ nfila2 ++ nfila3 ++ parte2
+anadirMina:: [[Int]]->Int->[[Int]]
+anadirMina tablero x = parte1 ++ nfila1 ++ nfila2 ++ nfila3 ++ parte2
     where (parte1,resto) = splitAt (a-1) tablero
           (centro,parte2) = splitAt 3 resto
           (fila1,filas) = splitAt 1 centro
@@ -31,14 +31,14 @@ añadirmina tablero x = parte1 ++ nfila1 ++ nfila2 ++ nfila3 ++ parte2
           (a,b)= casillas!!x
           casillas=[(x,y) | x <- [1..11], y <- [1..11]]
           
-sumarunos::Int-> [[Int]]->[[Int]]
-sumarunos b fila = iz ++ [fil] ++ dr
+sumarUnos::Int-> [[Int]]->[[Int]]
+sumarUnos b fila = iz ++ [fil] ++ dr
     where (iz,resto) = splitAt (b-1) fila
           (centro, dr) = splitAt 3 resto
-          fil= map s1 (concat centro)
+          fil= map sumaUno (concat centro)
 
-sumarunosmina::Int-> [[Int]]->[[Int]]
-sumarunosmina b fila = iz ++ [fil] ++ dr
+sumarUnosMina::Int-> [[Int]]->[[Int]]
+sumarUnosMina b fila = iz ++ [fil] ++ dr
     where (iz,resto) = splitAt (b-1) fila
           (centro, dr) = splitAt 3 resto
           filaa= concat centro
@@ -46,18 +46,18 @@ sumarunosmina b fila = iz ++ [fil] ++ dr
     
  
   
-s1::Int->Int
-s1 a   
+sumaUno::Int->Int
+sumaUno a   
     | a==11 = a
     | a==12 = a
     | otherwise = a+1
 
     
           
-listaminas::Int->G->[Int]->[Int]
-listaminas n g lista   
-  | busca r lista = listaminas n newg lista
-  | otherwise = r:(listaminas (n-1) newg (r:lista))  
+listaMinas::Int->G->[Int]->[Int]
+listaMinas n g lista   
+  | busca r lista = listaMinas n newg lista
+  | otherwise = r:(listaMinas (n-1) newg (r:lista))  
   where (r,newg)= randomR (1,81) (mkStdGen g)
   
 busca :: Ord a => a -> [a] -> Bool
@@ -66,9 +66,9 @@ busca x (y:ys)
   | x == y    = True
   | otherwise = busca x ys 
           
-ponerbordes::[[Int]]->[[Int]]
-ponerbordes tab= fila:(map bordes tab)++[fila]
-    where fila = [11 | x <- [0..11]] 
+ponerBordes::[[Int]]->[[Int]]
+ponerBordes tablero= fila:(map Bordes tablero)++[fila]
+    where fila = [11 | x <- [1..11]] 
     
-bordes::[Int]-[Int]
-bordes fila = 11:fila++[11]
+Bordes::[Int]-[Int]
+Bordes fila = 11:fila++[11]
