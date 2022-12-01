@@ -8,6 +8,4 @@ Para empezar con el nuevo menu, un input valido es
 que carga el tablero tipico con el que estabamos jugando.
 
 Falta:
-· Detectar partida ganadora y poner mensaje
-· Poder guardar intra partida
-· Generar mapas aleatorios
+· Generar mapas aleatorios e incorporarlo en menu
