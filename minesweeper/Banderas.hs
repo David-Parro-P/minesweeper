@@ -24,3 +24,8 @@ banderaCasilla (Desc(x)) = Desc(x)
 banderaCasilla (Flag(x)) = NoDesc(x)
 banderaCasilla Aux = Aux
 banderaCasilla (NoDesc(x)) = (Flag(x))
+
+
+minasABandera :: Estado -> Estado
+minasABandera (Desc(Mina))   = Flag(Mina)
+minasABandera (NoDesc(Mina)) = Flag(Mina)

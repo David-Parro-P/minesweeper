@@ -40,7 +40,6 @@ limpiarCerosFront tablero   =  f listaDeIncidencias
 repetirN :: (a -> a) -> a -> Int -> a
 repetirN f x n  = iterate f x !! n
 
--- Reescribir como FOLDR !!!!!
 
 limpiarCerosTablero :: TableroFront -> [[(Int,Int)]] -> TableroFront
 limpiarCerosTablero tablero []   = tablero

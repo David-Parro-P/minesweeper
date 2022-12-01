@@ -3,8 +3,11 @@ module Descubrir
 ( descubrir
 , descubrirFila
 , descubrirCasilla
-, descubrirTodoTest
-, descubrirTodo
+, descubrirTodoPerdedor
+, descubrirCasillaPerdedor
+, descubrirTodoGanador
+, descubrirCasillaGanador
+, encontrarMina
 ) where
 
 import Datos
@@ -34,33 +37,28 @@ descubrirCasilla (NoDesc(NoMina[x]))
    |otherwise = (Desc(NoMina[x]))
 
 -- Para ensenar todo endGame
+descubrirTodoPerdedor :: TableroFront -> TableroFront
+descubrirTodoPerdedor tablero = (map.map) descubrirCasillaPerdedor tablero
+-- Este destapa banderas para el endgame perdedor
 
+descubrirCasillaPerdedor :: Estado -> Estado
+descubrirCasillaPerdedor (Desc(x))           = Desc(x)
+descubrirCasillaPerdedor (Flag(x))           = Desc(x)
+descubrirCasillaPerdedor Aux                 = Aux
+descubrirCasillaPerdedor (NoDesc(Mina))      = (Desc(Mina))
+descubrirCasillaPerdedor (NoDesc(NoMina[x])) = Desc(NoMina[x])
 
-descubrirTodoTest :: TableroFront -> [(Int,Int)] -> TableroFront
-descubrirTodoTest tablero [] = tablero
-descubrirTodoTest tablero (x:xs) = descubrirTodoTest (descubrir' 0 x tablero) xs
+-- Para ensenar todo endGame
+descubrirTodoGanador :: TableroFront -> TableroFront
+descubrirTodoGanador tablero = (map.map) descubrirCasillaGanador tablero
+-- Este destapa banderas para el endgame perdedor
 
-descubrirTodo :: TableroFront -> TableroFront
-descubrirTodo tablero = descubrirTodoTest tablero casillas
-   where casillas = [(x,y) | x <- [1..(length tablero - 2)] , y <- [1..(length (tablero!!0) - 2)]]
+descubrirCasillaGanador :: Estado -> Estado
+descubrirCasillaGanador (Desc(x))           = Desc(x)
+descubrirCasillaGanador (Flag(x))           = Flag(x)
+descubrirCasillaGanador Aux                 = Aux
+descubrirCasillaGanador (NoDesc(Mina))      = (Flag(Mina))
+descubrirCasillaGanador (NoDesc(NoMina[x])) = Desc(NoMina[x])
 
-descubrir' :: Int -> (Int,Int) -> TableroFront -> TableroFront
-descubrir' contador (n,m) [] = []
-descubrir' contador (n,m) (x:xs)
-   |contador == n = (descubrirFila' (n,m) x) : xs 
-   |otherwise = x : (descubrir' (contador+1) (n,m) xs)
-
-descubrirFila' :: (Int,Int) -> [Estado] -> [Estado] 
-descubrirFila' (n,m) fila = primera ++ [descubrirCasilla' posicion] ++ tail(segunda)
-   where primera = fst(splitAt m (fila))
-         segunda = snd(splitAt m (fila))
-         posicion = (fila)!!m
-
-descubrirCasilla' :: Estado -> Estado
-descubrirCasilla' (Desc(x)) = Desc(x)
-descubrirCasilla' (Flag(x)) = Desc(x)
-descubrirCasilla' Aux = Aux
-descubrirCasilla' (NoDesc(Mina)) = (Desc(Mina))
-descubrirCasilla' (NoDesc(NoMina[x]))
-   |x == 0 = Desc(NoMina[x])
-   |otherwise = (Desc(NoMina[x]))
+encontrarMina :: TableroFront -> Bool
+encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)

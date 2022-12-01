@@ -32,25 +32,23 @@ main = do
    ** MENUS y temas de IO **
 
 -}
--- CAMBIAR DE SITIO Y ESCRIBIRLA
-encontrarMina :: TableroFront -> Bool
-encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)
 
--- ¿eliminar la doble copia?
-
-bucleJuego :: TableroFront  -> IO()
-bucleJuego tablero = do
-   accion       <- bucleAccion
-   n            <- fmap (read :: String -> Int) (bucleCoordenada (length tablero -2))
-   m            <- fmap (read :: String -> Int) (bucleCoordenadaDos (length (tablero!!0) -2))
+bucleJuego :: TableroFront  -> TableroFront -> IO()
+bucleJuego tablero tableroGanador = do
+   accion           <- bucleAccion tablero
+   n                <- fmap (read :: String -> Int) (bucleCoordenada (length tablero -2))
+   m                <- fmap (read :: String -> Int) (bucleCoordenadaDos (length (tablero!!0) -2))
    let tablero2     = accionJuego tablero (n,m) accion
    let tableroNuevo = limpiarTableroFeliz tablero2
    if encontrarMina tableroNuevo
    then do
-      let tableroPerdedor = descubrirTodo tableroNuevo
-      putStrLn ("Has perdido, ¿Quieres volver a jugar? (s/n)")
-      mapM_ putStrLn (dibujarTablero tableroPerdedor) >> volverJugar
-   else mapM_ putStrLn (dibujarTablero tableroNuevo) >> bucleJuego tableroNuevo
+      let tableroPerdedor = descubrirTodoPerdedor tableroNuevo
+      sacarGrafico "derrota.txt"
+      dibujarTableroSalida tableroPerdedor >> volverJugar
+   else do 
+      if tableroNuevo == tableroGanador
+      then sacarGrafico "victoria.txt" >> dibujarTableroSalida tableroGanador  >> volverJugar
+      else dibujarTableroSalida tableroNuevo   >> bucleJuego tableroNuevo tableroGanador
 
 
 accionJuego :: TableroFront -> (Int,Int) -> String -> TableroFront
@@ -58,13 +56,16 @@ accionJuego tablero (n,m) "b" = bandera   0 (n,m) tablero
 accionJuego tablero (n,m) "d" = descubrir 0 (n,m) tablero
 
 
-bucleAccion :: IO String
-bucleAccion = do
-   putStrLn "¿Que accion quieres hacer? (bandera/b) o (descubrir/d)"
+bucleAccion :: TableroFront -> IO String
+bucleAccion tablero = do
+   putStrLn "¿Que accion quieres hacer? poner bandera (b), descubrir casilla (d) o guardar partida (g)"
    accion <- getLine
-   if accion == "bandera" || accion == "b" || accion == "descubrir" || accion == "d"
-   then return accion
-   else putStrLn "No es una accion correcta" >> bucleAccion
+   if accion == "g"
+   then guardarPartida tablero >> bucleAccion tablero
+   else do
+      if accion == "bandera" || accion == "b" || accion == "descubrir" || accion == "d"
+      then return accion
+      else putStrLn "No es una accion correcta" >> bucleAccion tablero 
 
 bucleCoordenada :: Int -> IO String
 bucleCoordenada longitud = do
@@ -84,15 +85,17 @@ bucleCoordenadaDos longDos = do
 
 bucleMenu :: IO()
 bucleMenu = do
-   sacarTitulo
+   sacarGrafico "titulo.txt"
    accionM <- bucleAccionMenu
-   if accionM == "c" 
+   if accionM == "c" -- bucleAccionMenu protege que estos inputs sean asi 
    then do
-      tableroC  <- cargarPartida
-      bucleJuego tableroC
+      tableroC           <- cargarPartida
+      let tableroGanador = descubrirTodoGanador tableroC 
+      bucleJuego tableroC tableroGanador
    else do
-      tableroN <- nuevaPartida
-      bucleJuego tableroN
+      tableroN           <- nuevaPartida
+      let tableroGanador = descubrirTodoGanador tableroN
+      bucleJuego tableroN tableroGanador
 
 bucleAccionMenu :: IO String
 bucleAccionMenu = do
@@ -108,6 +111,7 @@ guardarPartida tablero = do
    rutaGuardado <- getLine
    let contenidoGuardado = show tablero 
    writeFile rutaGuardado contenidoGuardado
+   putStrLn "Guardado con exito"
 
 cargarPartida :: IO TableroFront
 cargarPartida = do
@@ -125,30 +129,18 @@ nuevaPartida = do
 
 volverJugar :: IO()
 volverJugar = do
-   putStrLn "¿Quieres volver a jugar si(s)/no(n)?"
+   putStrLn "¿Quieres volver a jugar si(s) / no(n)?"
    accion <- getLine
    if accion == "s"
-   then sacarTitulo >> bucleMenu
+   then bucleMenu
    else do
       if accion == "n"
       then putStrLn "¡Gracias por jugar!"
       else putStrLn "No es una accion correcta" >> volverJugar
 
-sacarTitulo :: IO()
-sacarTitulo = do
-   contenidoTit  <- readFile "titulo.txt"
-   let contenidoTitL = (lines contenidoTit)
-   mapM_ putStrLn contenidoTitL
+
 
 {- ** ENDGAME ** -}
 
-
-
-
-
-
-{- Seguir el esquema del folio de menu
-   intenta que sea medio pura sin ifs
--}
 
 
