@@ -84,8 +84,9 @@ bucleCoordenadaDos longDos = do
 
 bucleMenu :: IO()
 bucleMenu = do
+   sacarTitulo
    accionM <- bucleAccionMenu
-   if accionM == "c"
+   if accionM == "c" 
    then do
       tableroC  <- cargarPartida
       bucleJuego tableroC
@@ -127,11 +128,18 @@ volverJugar = do
    putStrLn "¿Quieres volver a jugar si(s)/no(n)?"
    accion <- getLine
    if accion == "s"
-   then bucleMenu
+   then sacarTitulo >> bucleMenu
    else do
       if accion == "n"
       then putStrLn "¡Gracias por jugar!"
-      else putStrLn "No es una accion correcta" >> volverJugar 
+      else putStrLn "No es una accion correcta" >> volverJugar
+
+sacarTitulo :: IO()
+sacarTitulo = do
+   contenidoTit  <- readFile "titulo.txt"
+   let contenidoTitL = (lines contenidoTit)
+   mapM_ putStrLn contenidoTitL
+
 {- ** ENDGAME ** -}
 
 
