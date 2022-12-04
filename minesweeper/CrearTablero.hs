@@ -82,4 +82,4 @@ ponerBordes l tab= fila:(map bordes tab)++[fila]
     
 bordes::[Int]->[Int]
 bordes fila = 11:fila++[11]
-bordes fila = 11:fila++[11]
+

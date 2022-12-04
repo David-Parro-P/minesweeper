@@ -124,13 +124,44 @@ cargarPartida = do
 
 nuevaPartida :: IO TableroFront --  CON RANDOM
 nuevaPartida = do
-   putStrLn "illo no vea el timing"
    gen <- newStdGen
-   let (l,n)=(9,15)
-   let d= (4,5)
-   let (matriz,g2) = crearTablero l n gen d
-   let tableronuevo = modTableroFront matriz
-   return tableronuevo
+   (long,nMinas)        <- buclePrimerDescubrir
+   putStrLn("¿Que casilla quieres descubrir?")
+   n                    <- fmap (read :: String -> Int) (bucleCoordenada (long))
+   m                    <- fmap (read :: String -> Int) (bucleCoordenadaDos (long))
+   let (matriz,g2)      = crearTablero long nMinas gen (n,m)
+   let tableroNuevo     = modTableroFront matriz
+   let tableroNuevoDesc = limpiarTableroFeliz(descubrir 0 (n,m) tableroNuevo)
+   dibujarTableroSalida tableroNuevoDesc
+   return tableroNuevoDesc
+
+buclePrimerDescubrir :: IO (Int,Int)
+buclePrimerDescubrir = do
+   putStrLn "¿Que dicultad quieres?"
+   putStrLn "Facil: 9x9, 10 minas (f)"
+   putStrLn "Intermidio: 16x16, 40 minas (i)"
+   putStrLn "Dificil: 20x20 , 70 minas (d)"
+   accion <- bucleAccionPrimerDescubrir
+   if accion == "f"
+   then return (9,10)
+   else if accion == "i"
+        then return (16,40)
+        else return (20,70)
+
+bucleAccionPrimerDescubrir :: IO String
+bucleAccionPrimerDescubrir = do
+   accionPrimera <- getLine
+   if accionPrimera == "f" || accionPrimera == "i" || accionPrimera == "d" 
+   then return accionPrimera
+   else putStrLn "No es una accion correcta, elige f, i o d" >> bucleAccionPrimerDescubrir
+
+debugRandom :: IO ()
+debugRandom = do
+   gen <- newStdGen
+   let (matriz,g2)  = crearTablero 15 60 gen (4,4) -- CAMBIAR 9 por algo general
+   let tableroNuevo = modTableroFront matriz
+   let tableroDos   = descubrirTodoPerdedor tableroNuevo
+   dibujarTableroSalida tableroDos
 
 volverJugar :: IO()
 volverJugar = do
