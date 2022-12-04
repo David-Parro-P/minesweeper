@@ -1,5 +1,14 @@
 module CrearTablero
-( 
+( crearTablero 
+, anadirMinas
+, anadirMina
+, sumarUnos
+, sumarUnosMina
+, sumaUno
+, listaMinas
+, busca
+, ponerBordes
+, bordes
 ) where
 import System.Random
 
