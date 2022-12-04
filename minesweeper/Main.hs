@@ -14,6 +14,8 @@ import Banderas
 import Ceros
 import Prints
 import Transformadores
+import CrearTablero
+import System.Random
 
 
 
@@ -120,12 +122,13 @@ cargarPartida = do
    tableroCarga <- readFile rutaCargar
    return ((read::String->TableroFront) tableroCarga)
 
-nuevaPartida :: IO TableroFront -- PLACE HOLDER CAMBIAR POR FUNCION NUEVA CON RANDOM
+nuevaPartida :: IO TableroFront --  CON RANDOM
 nuevaPartida = do
-   putStrLn "¿Que partida quieres cargar?"
-   rutaCargar   <- getLine
-   tableroCarga <- readFile rutaCargar
-   return ((read::String->TableroFront) tableroCarga)
+   putStrLn "illo no vea el timing"
+   gen <- newStdGen
+   let matriz = crearTablero 10 gen []
+   let tableronuevo = modTableroFront matriz
+   return tableronuevo
 
 volverJugar :: IO()
 volverJugar = do
