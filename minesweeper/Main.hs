@@ -126,7 +126,9 @@ nuevaPartida :: IO TableroFront --  CON RANDOM
 nuevaPartida = do
    putStrLn "illo no vea el timing"
    gen <- newStdGen
-   let (matriz,g2) = crearTablero 10 gen []
+   let (l,n)=(9,15)
+   let d= (4,5)
+   let (matriz,g2) = crearTablero l n gen d
    let tableronuevo = modTableroFront matriz
    return tableronuevo
 
