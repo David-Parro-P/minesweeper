@@ -13,10 +13,12 @@ module CrearTablero
 import System.Random
 
 
-crearTablero::(RandomGen g) => Int-> Int-> g -> [Int]-> ([[Int]],g)
-crearTablero l nminas g desc  = (anadirMinas l posminas (ponerBordes l tablero0),g2)
+crearTablero::(RandomGen g) => Int-> Int-> g -> (Int,Int) -> ([[Int]],g)
+crearTablero l nminas g (f,c)  = (anadirMinas l posminas (ponerBordes l tablero0),g2)
     where fila= [0 | x <- [1..l]]
           tablero0 = [fila | x <- [1..l]]
+          d= (f-1)*(l) + c-1
+          desc= [x+y*l |y <- [(-2)..2] , x <- [(d-2)..(d+2)]]
           (posminas,g2)= listaMinas l nminas g desc
           
           
@@ -62,11 +64,11 @@ sumaUno a
 listaMinas::(RandomGen g) => Int -> Int -> g -> [Int]-> ([Int], g)
 listaMinas l 0 g lista = ([], g)
 listaMinas l n g lista   
-  | busca r lista = (fst(listaMinas l n g1 lista) , g1)
-  | otherwise = (r:lista , g2)  
+  | busca r lista = listaMinas l n g1 lista
+  | otherwise = (r:nlista , g2)  
   where (r,g1)= randomR (0,t) g
         t= l*l-1
-        (lista,g2)=listaMinas l (n-1) g1 (r:lista)
+        (nlista,g2)=listaMinas l (n-1) g1 (r:lista)
   
 busca :: Ord a => a -> [a] -> Bool
 busca x [] = False
@@ -79,4 +81,5 @@ ponerBordes l tab= fila:(map bordes tab)++[fila]
     where fila = [11 | x <- [1..(l+2)]] 
     
 bordes::[Int]->[Int]
+bordes fila = 11:fila++[11]
 bordes fila = 11:fila++[11]
