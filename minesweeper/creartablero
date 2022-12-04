@@ -51,8 +51,9 @@ listaMinas::(RandomGen g) => Int -> g -> [Int]-> ([Int], g)
 listaMinas 0 g lista = ([], g)
 listaMinas n g lista   
   | busca r lista = (fst(listaMinas n g1 lista) , g1)
-  | otherwise = (r:(fst (listaMinas (n-1) g1 (r:lista))) , g1)  
+  | otherwise = (r:lista , g2)  
   where (r,g1)= randomR (0,80) g
+        (lista,g2)=listaMinas (n-1) g1 (r:lista)
   
 busca :: Ord a => a -> [a] -> Bool
 busca x [] = False
