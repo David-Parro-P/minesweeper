@@ -1,3 +1,6 @@
+module CrearTablero
+( 
+) where
 import System.Random
 
 
