@@ -14,72 +14,72 @@ import System.Random
 
 
 crearTablero::(RandomGen g) => Int-> Int-> g -> (Int,Int) -> ([[Int]],g)
-crearTablero l nminas g (f,c)  = (anadirMinas l posminas (ponerBordes l tablero0),g2)
-    where fila= [0 | x <- [1..l]]
-          tablero0 = [fila | x <- [1..l]]
-          d= (f-1)*(l) + c-1
-          desc= [x+y*l |y <- [(-2)..2] , x <- [(d-2)..(d+2)]]
-          (posminas,g2)= listaMinas l nminas g desc
+crearTablero lado nminas seed (fil,col)  = (anadirMinas lado (ponerBordes lado tablero0) posminas,seed2)
+    where fila             = [0 | x <- [1..lado]]
+          tablero0         = [fila | x <- [1..lado]]
+          pos              = (fil-1)*(lado) + col-1
+          ceros            = [x+y*lado |y <- [(-2)..2] , x <- [(pos-2)..(pos+2)]]
+          (posminas,seed2) = listaMinas lado nminas seed ceros
           
           
+anadirMinas:: Int->[[Int]]->[Int]->[[Int]]
+anadirMinas lado tablero = foldl (anadirMina lado) tablero 
 
-anadirMinas:: Int->[Int]->[[Int]]->[[Int]]
-anadirMinas l [] tablero = tablero
-anadirMinas l (x:xs) tablero = anadirMinas l xs (anadirMina l x tablero )
          
-anadirMina:: Int->Int->[[Int]]->[[Int]]
-anadirMina l pos tablero = parte1 ++ [nfila1] ++ [nfila2]++ [nfila3] ++ parte2
-    where (parte1,resto) = splitAt (a-1) tablero
-          (centro,parte2) = splitAt 3 resto
-          (fila1,filas) = splitAt 1 centro
-          (fila2,fila3)= splitAt 1 filas
-          nfila1= sumarUnos b (concat fila1)
-          nfila2= sumarUnosMina b (concat fila2)
-          nfila3= sumarUnos b (concat fila3)
-          (a,b)= casillas!!pos
-          casillas=[(x,y) | x <- [1..l], y <- [1..l]]
+anadirMina:: Int->[[Int]]->Int->[[Int]]
+anadirMina lado tablero pos = arriba ++ [fila1] ++ [fila2]++ [fila3] ++ abajo
+    where (arriba,resto)        = splitAt (nFil-1) tablero
+          (centro,abajo)        = splitAt 3 resto
+          (preFila1,filas)      = splitAt 1 centro
+          (preFila2,preFila3)   = splitAt 1 filas
+          fila1                 = sumarUnos nCol (concat preFila1)
+          fila2                 = sumarUnosMina nCol (concat preFila2)
+          fila3                 = sumarUnos nCol (concat preFila3)
+          nFil                  = (pos `div` lado) +1
+          nCol                  = ((pos+1) `mod` lado)
+          
+          
           
 sumarUnos::Int-> [Int]->[Int]
 sumarUnos b fila = iz ++ fil ++ dr
-    where (iz,resto) = splitAt (b-1) fila
+    where (iz,resto)   = splitAt (b-1) fila
           (centro, dr) = splitAt 3 resto
-          fil= map sumaUno ( centro)
+          fil          = map sumaUno ( centro)
 
 sumarUnosMina::Int-> [Int]->[Int]
-sumarUnosMina b fila = iz ++ fil ++ dr
-    where (iz,resto) = splitAt (b-1) fila
+sumarUnosMina col fila = iz ++ fil ++ dr
+    where (iz,resto)   = splitAt (col-1) fila
           (centro, dr) = splitAt 3 resto
-          izz=take 1 centro
-          drr= take 1 (reverse centro)
-          fil= (map sumaUno izz) ++ [12] ++ (map sumaUno drr)
+          izz          = take 1 centro
+          drr          = take 1 (reverse centro)
+          fil          = map sumaUno (izz ++ [12] ++ drr)
     
-
 sumaUno::Int->Int
-sumaUno a   
-    | a==11 = a
-    | a==12 = a
-    | otherwise = a+1
-  
-          
+sumaUno casilla   
+    | casilla==11     = casilla
+    | casilla==12     = casilla
+    | otherwise       = casilla+1
+
 listaMinas::(RandomGen g) => Int -> Int -> g -> [Int]-> ([Int], g)
-listaMinas l 0 g lista = ([], g)
-listaMinas l n g lista   
-  | busca r lista = listaMinas l n g1 lista
-  | otherwise = (r:nlista , g2)  
-  where (r,g1)= randomR (0,t) g
-        t= l*l-1
-        (nlista,g2)=listaMinas l (n-1) g1 (r:lista)
-  
+listaMinas lado 0 seed lista = ([], seed)
+listaMinas lado n seed lista   
+  | busca r lista = listaMinas lado n seed1 lista
+  | otherwise     = (r:nlista , seed2)  
+  where (r,seed1)      = randomR (0,tope) seed
+        tope           = lado*lado-1
+        (nlista,seed2) = listaMinas lado (n-1) seed1 (r:lista) 
+          
+
+
 busca :: Ord a => a -> [a] -> Bool
-busca x [] = False
-busca x (y:ys)
-  | x == y    = True
-  | otherwise = busca x ys 
+busca x xs = not (foldr (&&) True (map (x/=) xs))
+
+  
+
           
 ponerBordes::Int -> [[Int]]->[[Int]]
-ponerBordes l tab= fila:(map bordes tab)++[fila]
-    where fila = [11 | x <- [1..(l+2)]] 
+ponerBordes lado tab = fila:(map bordes tab)++[fila]
+    where fila    = [11 | x <- [1..(lado+2)]] 
     
 bordes::[Int]->[Int]
-bordes fila = 11:fila++[11]
-
+bordes fila = 11:fila ++ [11]
