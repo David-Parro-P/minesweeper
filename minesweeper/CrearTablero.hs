@@ -9,7 +9,10 @@ module CrearTablero
 , busca
 , ponerBordes
 , bordes
+, modTableroFront
+, modCasillaFront
 ) where
+import Datos
 import System.Random
 
 --Función que crea una matriz L*L, con un numero de minas, con una seed
@@ -100,3 +103,14 @@ ponerBordes lado tab = fila:(map bordes tab)++[fila]
 bordes::[Int]->[Int]
 bordes fila = 11:fila ++ [11]
 
+-- Modificamos un tablero numerico a un tablero jugable
+-- Se usa para convertir los tableros aleatorios.
+
+modTableroFront :: [[Int]] -> TableroFront
+modTableroFront xs = (map.map) modCasillaFront xs
+
+modCasillaFront :: Int -> Estado
+modCasillaFront x
+  |x == 11   = Borde 
+  |x == 12   = (NoDesc Mina)
+  |otherwise = (NoDesc (NoMina [x]))
