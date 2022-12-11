@@ -1,64 +1,90 @@
 
 module Descubrir
-( descubrir
-, descubrirFila
+(aplicarConcreto
+, aplicarConcretoFila
+, descubrir
 , descubrirCasilla
+, bandera
+, banderaCasilla
 , descubrirTodoPerdedor
-, descubrirCasillaPerdedor
 , descubrirTodoGanador
-, descubrirCasillaGanador
+, aplicarATodo
+, introducirCambios
+, identidad
+, minaABandera
+, destapar
 , encontrarMina
 ) where
 
 import Datos
--- hay que hacer la accion en la priemra llamada con un int = 0
+-- Hay que hacer la accion en la priemra llamada con un int = 0
 -- los dos primeros ints son unos contadores de posicion
 -- la segunda es el resultado de la funcion buscar ceros que devuelve la posicion
 
-descubrir :: Int -> (Int,Int) -> TableroFront -> TableroFront
-descubrir contador (n,m) [] = []
-descubrir contador (n,m) (x:xs)
-   |contador == n = (descubrirFila (n,m) x) : xs 
-   |otherwise = x : (descubrir (contador+1) (n,m) xs)
 
-descubrirFila :: (Int,Int) -> [Estado] -> [Estado] 
-descubrirFila (n,m) fila = primera ++ [descubrirCasilla posicion] ++ tail(segunda)
-   where primera = fst(splitAt m (fila))
-         segunda = snd(splitAt m (fila))
+aplicarConcreto :: (Estado -> Estado) -> Int -> (Int,Int) -> TableroFront -> TableroFront
+aplicarConcreto f contador (n,m) [] = []
+aplicarConcreto f contador (n,m) (x:xs)
+   |contador == n = (aplicarConcretoFila f (n,m) x) : xs 
+   |otherwise     = x : (aplicarConcreto f (contador+1) (n,m) xs)
+
+aplicarConcretoFila :: (Estado -> Estado) -> (Int,Int) -> [Estado] -> [Estado] 
+aplicarConcretoFila f (n,m) fila = primera ++ [f posicion] ++ tail(segunda)
+   where primera  = fst(splitAt m (fila))
+         segunda  = snd(splitAt m (fila))
          posicion = (fila)!!m
 
+descubrir :: Int -> (Int,Int) -> TableroFront -> TableroFront
+descubrir contador (n,m) tablero = aplicarConcreto descubrirCasilla contador (n,m) tablero
+
 descubrirCasilla :: Estado -> Estado
-descubrirCasilla (Desc(x)) = Desc(x)
-descubrirCasilla (Flag(x)) = Flag(x)
-descubrirCasilla Aux = Aux
-descubrirCasilla (NoDesc(Mina)) = (Desc(Mina))
-descubrirCasilla (NoDesc(NoMina[x]))
-   |x == 0 = Desc(NoMina[x])
-   |otherwise = (Desc(NoMina[x]))
+descubrirCasilla (NoDesc(Mina))      = (Desc(Mina))
+descubrirCasilla (NoDesc(NoMina[x])) = (Desc(NoMina[x]))
+descubrirCasilla x                   =  x
 
--- Para ensenar todo endGame
+bandera :: Int -> (Int,Int) -> TableroFront -> TableroFront
+bandera contador (n,m) tablero = aplicarConcreto banderaCasilla contador (n,m) tablero
+
+banderaCasilla :: Estado -> Estado
+banderaCasilla (Desc(x))   = Desc(x)
+banderaCasilla (Flag(x))   = NoDesc(x)
+banderaCasilla Borde       = Borde
+banderaCasilla (NoDesc(x)) = (Flag(x))
+
 descubrirTodoPerdedor :: TableroFront -> TableroFront
-descubrirTodoPerdedor tablero = (map.map) descubrirCasillaPerdedor tablero
--- Este destapa banderas para el endgame perdedor
-
-descubrirCasillaPerdedor :: Estado -> Estado
-descubrirCasillaPerdedor (Desc(x))           = Desc(x)
-descubrirCasillaPerdedor (Flag(x))           = Desc(x)
-descubrirCasillaPerdedor Aux                 = Aux
-descubrirCasillaPerdedor (NoDesc(Mina))      = (Desc(Mina))
-descubrirCasillaPerdedor (NoDesc(NoMina[x])) = Desc(NoMina[x])
-
--- Para ensenar todo endGame
+descubrirTodoPerdedor tablero = aplicarATodo (introducirCambios lista) tablero
+   where lista = [destapar, identidad, destapar, destapar]
+   
 descubrirTodoGanador :: TableroFront -> TableroFront
-descubrirTodoGanador tablero = (map.map) descubrirCasillaGanador tablero
--- Este destapa banderas para el endgame perdedor
+descubrirTodoGanador tablero = aplicarATodo (introducirCambios lista) tablero
+   where lista = [identidad, identidad, minaABandera, destapar]
 
-descubrirCasillaGanador :: Estado -> Estado
-descubrirCasillaGanador (Desc(x))           = Desc(x)
-descubrirCasillaGanador (Flag(x))           = Flag(x)
-descubrirCasillaGanador Aux                 = Aux
-descubrirCasillaGanador (NoDesc(Mina))      = (Flag(Mina))
-descubrirCasillaGanador (NoDesc(NoMina[x])) = Desc(NoMina[x])
+aplicarATodo :: (Estado -> Estado) -> TableroFront -> TableroFront
+aplicarATodo f tablero = (map.map) f tablero
+
+-- Estructura, una lista de 4 funciones, cada una trabaja un Estado
+-- L!!0 decide que pasa con Flag
+-- L!!1 decide que pasa con Desc
+-- L!!2 decide que pasa con NoDesc(Mina)
+-- L!!3 decide que pasa con NoDesc(NoMina[x])
+
+introducirCambios :: [(Estado -> Estado)] -> Estado -> Estado
+introducirCambios listaF Borde               =  Borde
+introducirCambios listaF (Flag(x))           = (listaF!!0) (Flag(x))
+introducirCambios listaF (Desc(x))           = (listaF!!1) (Desc(x))
+introducirCambios listaF (NoDesc(Mina))      = (listaF!!2) (NoDesc(Mina))
+introducirCambios listaF (NoDesc(NoMina[x])) = (listaF!!3) (NoDesc(NoMina[x]))
+
+identidad :: Estado -> Estado
+identidad x = x
+
+minaABandera :: Estado -> Estado
+minaABandera (NoDesc(Mina)) = (Flag(Mina))
+minaABandera x              = x
+
+destapar :: Estado -> Estado
+destapar (NoDesc(x)) = (Desc(x))
+destapar x           = x
 
 encontrarMina :: TableroFront -> Bool
 encontrarMina tablero = elem True (map (elem (Desc(Mina))) tablero)

@@ -14,10 +14,9 @@ import Descubrir
 buscarCerosTablero :: (Int,Int) -> TableroFront -> [(Int,Int)]
 buscarCerosTablero _ [[]] = []
 buscarCerosTablero (n,m) tablero
-   |tablero!!0 == [] = []
+   |tablero!!0 == []                     = []
    |a == length(tablero)                 = []
    |b >= length(tablero!!0)              = (buscarCerosTablero (a+1,0) tablero)
-
    |(tablero!!a)!!b == (Desc(NoMina[0])) = (a,b) : (buscarCerosTablero (a,b+1) tablero)
    |otherwise = buscarCerosTablero (a,b+1) tablero
    where a = fst (n,m)
@@ -42,7 +41,7 @@ repetirN f x n  = iterate f x !! n
 
 
 limpiarCerosTablero :: TableroFront -> [[(Int,Int)]] -> TableroFront
-limpiarCerosTablero tablero []   = tablero
+limpiarCerosTablero tablero []     = tablero
 limpiarCerosTablero tablero (x:xs) = limpiarCerosTablero (limpiarCeros tablero x) xs 
 
 

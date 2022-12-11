@@ -10,7 +10,6 @@ module Main
 
 import Datos
 import Descubrir
-import Banderas
 import Ceros
 import Prints
 import Transformadores
@@ -173,10 +172,3 @@ volverJugar = do
       if accion == "n"
       then putStrLn "¡Gracias por jugar!"
       else putStrLn "No es una accion correcta" >> volverJugar
-
-
-
-{- ** ENDGAME ** -}
-
-
-
