@@ -1,0 +1,7 @@
+La forma de inicializar el juego es:
+Abrir una consola de GHCI que puedar importar random, nosotros escribimos "stack ghci"
+Cargar el archivo Main.hs
+Escribir "main" y a partir de ahí el juego hace de guía.
+
+El Haskell impuro está todo en Main y Prints que son los módulos que tratan con entrada y salida.
+El resto de módulos están clasificados según que parte del juego tratan las funciones de dentro.
