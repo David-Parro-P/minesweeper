@@ -8,8 +8,7 @@ import Descubrir
 
 
 nuevoDescubrirLista :: TableroFront -> [(Int,Int)] -> TableroFront 
-nuevoDescubrirLista tablero [] = tablero
-nuevoDescubrirLista tablero (x:xs) = nuevoDescubrirLista (nuevoDescubrir tablero x) xs
+nuevoDescubrirLista tablero  = foldl nuevoDescubrir tablero 
 
 nuevoDescubrir :: TableroFront -> (Int,Int) -> TableroFront
 nuevoDescubrir tablero (fil,col)
