@@ -60,7 +60,7 @@ nuevaPartida = do
    m                    <- fmap (read :: String -> Int) (bucleCoordenada "Columnas" (long))
    let matriz      = crearTablero long nMinas gen (n,m)
    let tableroNuevo     = modTableroFront matriz
-   let tableroNuevoDesc = limpiarTableroFeliz(descubrir 0 (n,m) tableroNuevo)
+   let tableroNuevoDesc = nuevoDescubrir  tableroNuevo (n,m)
    dibujarTableroSalida tableroNuevoDesc
    return tableroNuevoDesc
 
@@ -78,7 +78,7 @@ bucleJuego tablero tableroGanador = do
    n                <- fmap (read :: String -> Int) (bucleCoordenada "Filas" (length tablero -2))
    m                <- fmap (read :: String -> Int) (bucleCoordenada "Columnas" (length (tablero!!0) -2))
    let tablero2     = accionJuego tablero (n,m) accion
-   let tableroNuevo = limpiarTableroFeliz tablero2
+   let tableroNuevo =  tablero2
    if encontrarMina tableroNuevo
    then do
       let tableroPerdedor = descubrirTodoPerdedor tableroNuevo
@@ -99,8 +99,8 @@ bucleAccion tablero = do
 
 -- Si ha elegido bandera o descubrir lo ejecuta en la casilla elegida.
 accionJuego :: TableroFront -> (Int,Int) -> String -> TableroFront
-accionJuego tablero (n,m) "b" = bandera   0 (n,m) tablero 
-accionJuego tablero (n,m) "d" = descubrir 0 (n,m) tablero
+--accionJuego tablero (n,m) "b" = bandera   0 (n,m) tablero 
+accionJuego tablero (n,m) "d" = nuevoDescubrir tablero (n,m) 
 
 -- Le pregunta al jugador que casilla quiere descubrir/poner bandera, si no es una posición válida
 -- Vuelve a preguntar 
@@ -163,3 +163,6 @@ ejecutarRespuesta :: [(String, IO a)] -> String -> IO a
 ejecutarRespuesta (x:xs) respuesta
    |fst(x) == respuesta  = snd(x)
    |otherwise            = ejecutarRespuesta xs respuesta
+
+
+
