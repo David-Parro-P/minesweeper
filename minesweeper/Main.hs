@@ -58,7 +58,7 @@ nuevaPartida = do
    putStrLn("¿Que casilla quieres descubrir?")
    n                    <- fmap (read :: String -> Int) (bucleCoordenada "Filas" (long))
    m                    <- fmap (read :: String -> Int) (bucleCoordenada "Columnas" (long))
-   let (matriz,g2)      = crearTablero long nMinas gen (n,m)
+   let matriz      = crearTablero long nMinas gen (n,m)
    let tableroNuevo     = modTableroFront matriz
    let tableroNuevoDesc = limpiarTableroFeliz(descubrir 0 (n,m) tableroNuevo)
    dibujarTableroSalida tableroNuevoDesc
