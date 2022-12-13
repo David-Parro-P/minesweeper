@@ -19,8 +19,8 @@ import System.Random
 -- y con una casilla alrededor de la cual no se generarán minas.
 -- Dentro de la función convierte las casillas de la forma (fila,columna)
 -- a un número entre 0 y (L*L-1), siendo L el lado del tablero.
-crearTablero::(RandomGen g) => Int-> Int-> g -> (Int,Int) -> ([[Int]],g)
-crearTablero lado nminas seed (fil,col)  = (anadirMinas lado (ponerBordes lado tablero0) posminas,seed2)
+crearTablero::(RandomGen g) => Int-> Int-> g -> (Int,Int) -> [[Int]]
+crearTablero lado nminas seed (fil,col)  = anadirMinas lado (ponerBordes lado tablero0) posminas
     where fila             = [0 | x <- [1..lado]]
           tablero0         = [fila | x <- [1..lado]]
           pos              = (fil-1)*(lado) + col-1 
