@@ -96,7 +96,7 @@ bucleAccion tablero = do
 
 -- Si ha elegido bandera o descubrir lo ejecuta en la casilla elegida.
 accionJuego :: TableroFront -> (Int,Int) -> String -> TableroFront
---accionJuego tablero (n,m) "b" = bandera   0 (n,m) tablero 
+accionJuego tablero (n,m) "b" = bandera 0 (n,m) tablero 
 accionJuego tablero (n,m) "d" = nuevoDescubrir tablero (n,m) 
 
 -- Le pregunta al jugador que casilla quiere descubrir/poner bandera, si no es una posición válida
