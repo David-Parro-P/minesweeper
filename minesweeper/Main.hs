@@ -16,9 +16,7 @@ module Main
 
 import Datos
 import Descubrir
-import Ceros
 import Prints
-import Transformadores
 import CrearTablero
 import System.Random
 
@@ -58,7 +56,7 @@ nuevaPartida = do
    putStrLn("¿Que casilla quieres descubrir?")
    n                    <- fmap (read :: String -> Int) (bucleCoordenada "Filas" (long))
    m                    <- fmap (read :: String -> Int) (bucleCoordenada "Columnas" (long))
-   let matriz      = crearTablero long nMinas gen (n,m)
+   let matriz           = crearTablero long nMinas gen (n,m)
    let tableroNuevo     = modTableroFront matriz
    let tableroNuevoDesc = nuevoDescubrir  tableroNuevo (n,m)
    dibujarTableroSalida tableroNuevoDesc
@@ -77,8 +75,7 @@ bucleJuego tablero tableroGanador = do
    accion           <- bucleAccion tablero
    n                <- fmap (read :: String -> Int) (bucleCoordenada "Filas" (length tablero -2))
    m                <- fmap (read :: String -> Int) (bucleCoordenada "Columnas" (length (tablero!!0) -2))
-   let tablero2     = accionJuego tablero (n,m) accion
-   let tableroNuevo =  tablero2
+   let tableroNuevo     = accionJuego tablero (n,m) accion
    if encontrarMina tableroNuevo
    then do
       let tableroPerdedor = descubrirTodoPerdedor tableroNuevo
@@ -163,6 +160,3 @@ ejecutarRespuesta :: [(String, IO a)] -> String -> IO a
 ejecutarRespuesta (x:xs) respuesta
    |fst(x) == respuesta  = snd(x)
    |otherwise            = ejecutarRespuesta xs respuesta
-
-
-

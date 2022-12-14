@@ -9,6 +9,7 @@ module Descubrir
 , descubrirTodoPerdedor
 , descubrirTodoGanador
 , aplicarATodo
+, nuevoDescubrir
 , introducirCambios
 , identidad
 , minaABandera
@@ -35,6 +36,19 @@ aplicarConcretoFila f (n,m) fila = primera ++ [f posicion] ++ tail(segunda)
    where primera  = fst(splitAt m (fila))
          segunda  = snd(splitAt m (fila))
          posicion = (fila)!!m
+
+-- Descubre la casilla que pide el jugador, si es un cero se asegura
+-- de limpiar todos los ceros que tiene alrededor
+nuevoDescubrir :: TableroFront -> (Int,Int) -> TableroFront
+nuevoDescubrir tablero (fil,col)
+   |(tablero!!fil)!!col == (NoDesc(NoMina[0])) = nuevoDescubrirLista (descubrir 0 (fil,col) tablero) lista
+   |otherwise                 = descubrir 0 (fil,col) tablero
+   where lista = [(fil,col-1)]++[(fil,col+1)]++[(fil+y, col+x)| x <- [-1,0,1],y <- [-1,1]] 
+
+nuevoDescubrirLista :: TableroFront -> [(Int,Int)] -> TableroFront 
+nuevoDescubrirLista tablero  = foldl nuevoDescubrir tablero 
+
+
 
 -- Hay que hacer la accion en la primera llamada con un int = 0
 -- los dos primeros ints son unos contadores de posicion
