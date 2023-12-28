@@ -9,3 +9,6 @@
 
 
 ![изображение](https://github.com/David-Parro-P/minesweeper/assets/42015059/70481208-44d9-4010-952a-074776847618)
+
+
+![изображение](https://github.com/David-Parro-P/minesweeper/assets/42015059/630d50c5-9a29-445e-b640-7e2ab2d316c7)
