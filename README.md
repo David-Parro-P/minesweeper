@@ -6,3 +6,6 @@
 
 
 # you can use the bot in releases
+
+
+![изображение](https://github.com/David-Parro-P/minesweeper/assets/42015059/70481208-44d9-4010-952a-074776847618)
